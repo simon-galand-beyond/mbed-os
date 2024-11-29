@@ -53,6 +53,15 @@ class GCC(mbedToolchain):
         )
 
         tool_path = TOOLCHAIN_PATHS['GCC_ARM']
+        if(not tool_path):
+            self.notify.cc_info({
+                "message": "GCC_ARM tool path not found. compile_commands.json might be incomplete. Please run mbed config -G GCC_ARM_PATH /<path/to/gcc_arm/bin>",
+                "file": "",
+                "line": "",
+                "col": "",
+                "severity": "Warning",
+            })
+
         # Add flags for current size setting
         c_lib = "std"
         if hasattr(target, "c_lib"):

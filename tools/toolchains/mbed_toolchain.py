@@ -490,6 +490,36 @@ class mbedToolchain(with_metaclass(ABCMeta, object)):
             else:
                 self.compiled += 1
                 objects.append(object)
+        
+        #Export compile commands in a compile_commands.json file
+        self.export_compile_commands = True #May be one day, implement a flag in the mbed compile command to set this
+        if self.export_compile_commands:
+            #Format queue to be compatible with clangd
+            """[
+                {
+                    "directory": "",
+                    "command": ""
+                    "file": ""
+                    "output": ""
+                }
+            ]"""
+            
+            lines = []
+            for item in queue:
+                #replace compiler executable with absolute path
+                item['commands'][0][0] = join(TOOLCHAIN_PATHS['GCC_ARM'], item['commands'][0][0]) 
+                compile_command = " ".join(item['commands'][0]).replace("\\", "/") 
+                lines.append({
+                    "directory": item['work_dir'],
+                    "command": compile_command,
+                    "file": item['source'].name,
+                    "output": item['object']
+                })
+            with open(join(item['work_dir'], "compile_commands.json"), "w") as f:
+                f.write(json.dumps(lines, indent=4))
+            
+            
+                
 
         # Use queues/multiprocessing if cpu count is higher than setting
         jobs = self.jobs if self.jobs else cpu_count()
