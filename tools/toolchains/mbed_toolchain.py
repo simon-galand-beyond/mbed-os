@@ -515,8 +515,9 @@ class mbedToolchain(with_metaclass(ABCMeta, object)):
                     "file": item['source'].name,
                     "output": item['object']
                 })
-            with open(join(item['work_dir'], "compile_commands.json"), "w") as f:
-                f.write(json.dumps(lines, indent=4))
+            if(len(lines) > 0):
+                with open(join(item['work_dir'], "compile_commands.json"), "w") as f:
+                    f.write(json.dumps(lines, indent=4))
             
             
                 
